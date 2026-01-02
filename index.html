@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <title>K53 Learner Exam Simulator</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+
+    body { font-family: Arial; background:#f4f4f4; padding:20px }
+
+    .card { background:#fff; padding:20px; border-radius:10px }
+
+    button { padding:10px 15px; margin-top:10px }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h2>K53 Learner Exam Simulator</h2>
+
+    <p>Question 1: What does a red traffic light mean?</p>
+
+    <button onclick="check(true)">Stop</button>
+
+    <button onclick="check(false)">Go</button>
+
+    <p id="result"></p>
+
+  </div>
+
+<script>
+
+function check(correct){
+
+  document.getElementById("result").innerText =
+
+    correct ? "Correct ✅" : "Wrong ❌";
+
+}
+
+</script>
+
+</body>
+
+</html>
+    
+  </body>
+  
+</html>
