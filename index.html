@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>K53 Learner Exam Simulator</title>
+<title>K53 Learner Licence Exam Simulator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -11,38 +11,36 @@ body {
   background: #f4f4f4;
   padding: 20px;
 }
-
 .card {
-  background: white;
+  background: #fff;
   padding: 20px;
   border-radius: 10px;
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
 }
-
 h1 {
   text-align: center;
 }
-
 .info {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
   font-weight: bold;
 }
-
 button {
-  display: block;
   width: 100%;
-  margin: 8px 0;
   padding: 12px;
+  margin: 6px 0;
   font-size: 16px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
-
 button:hover {
-  background: #eaeaea;
+  background: #eee;
+}
+#feedback {
+  font-weight: bold;
+  margin-top: 10px;
 }
 </style>
 </head>
@@ -53,96 +51,141 @@ button:hover {
   <h1>K53 Learner Exam</h1>
 
   <div class="info">
-    <span id="counter">Question 1</span>
-    <span id="timer">Time: 60s</span>
+    <span id="counter"></span>
+    <span id="timer"></span>
   </div>
 
+  <p id="category"></p>
   <p id="question"></p>
 
   <div id="answers"></div>
-
   <p id="feedback"></p>
 </div>
 
 <script>
+/* ================= TIMER ================= */
+let timeLeft = 3000; // 50 minutes
+let timer = setInterval(() => {
+  timeLeft--;
+  let minutes = Math.floor(timeLeft / 60);
+  let seconds = timeLeft % 60;
+  document.getElementById("timer").textContent =
+    `Time: ${minutes}:${seconds.toString().padStart(2, "0")}`;
+  if (timeLeft <= 0) endExam();
+}, 1000);
+
+/* ================= QUESTIONS ================= */
 const questions = [
-  {
-    q: "What does a red traffic light mean?",
-    options: ["Stop", "Go", "Slow down"],
-    correct: 0
-  },
-  {
-    q: "What does a stop sign mean?",
-    options: ["Slow down", "Stop completely", "Yield"],
-    correct: 1
-  },
-  {
-    q: "What should you do at a pedestrian crossing?",
-    options: ["Hoot", "Stop for pedestrians", "Speed up"],
-    correct: 1
-  }
+
+/* -------- RULES (22) -------- */
+{c:"Rules",q:"What is the legal blood alcohol limit for drivers?",o:["0.05g per 100ml","0.08g per 100ml","0.10g per 100ml"],a:0},
+{c:"Rules",q:"When may you overtake on the left?",o:["Never","When safe and road is wide enough","At night only"],a:1},
+{c:"Rules",q:"Who has right of way at a 4-way stop?",o:["First to stop","Right-hand vehicle","Fastest vehicle"],a:0},
+{c:"Rules",q:"What must you do at a red traffic light?",o:["Slow down","Stop","Proceed if clear"],a:1},
+{c:"Rules",q:"What is the speed limit in an urban area?",o:["60 km/h","80 km/h","100 km/h"],a:0},
+{c:"Rules",q:"What must you do when approaching a pedestrian crossing?",o:["Speed up","Stop if pedestrians are crossing","Hoot"],a:1},
+{c:"Rules",q:"When are headlights required?",o:["At night","When visibility is poor","Both"],a:2},
+{c:"Rules",q:"What does a flashing red light mean?",o:["Proceed carefully","Stop completely","Yield"],a:1},
+{c:"Rules",q:"Can you use a cellphone while driving?",o:["Yes","Only hands-free","Never"],a:1},
+{c:"Rules",q:"When must you signal?",o:["Before turning","After turning","Only on highways"],a:0},
+{c:"Rules",q:"What must you do when signaled by a traffic officer?",o:["Ignore signs","Follow officer","Stop vehicle"],a:1},
+{c:"Rules",q:"When may you cross a solid white line?",o:["Never","To avoid obstruction","Anytime"],a:1},
+{c:"Rules",q:"Seatbelts are required for:",o:["Driver only","Front passengers","All occupants"],a:2},
+{c:"Rules",q:"When must hazard lights be used?",o:["In fog","When vehicle is stationary","Both"],a:2},
+{c:"Rules",q:"What must you do at a yield sign?",o:["Stop","Slow and give way","Proceed fast"],a:1},
+{c:"Rules",q:"When may a driver sound the horn?",o:["To greet","To warn of danger","In traffic"],a:1},
+{c:"Rules",q:"What is the speed limit on a freeway?",o:["100 km/h","120 km/h","140 km/h"],a:1},
+{c:"Rules",q:"Can passengers ride in the back of a bakkie?",o:["Yes always","Only with permission","Only if seated and safe"],a:2},
+{c:"Rules",q:"What must you do after an accident?",o:["Leave","Stop and assist","Drive away"],a:1},
+{c:"Rules",q:"What is tailgating?",o:["Driving slowly","Following too closely","Overtaking"],a:1},
+{c:"Rules",q:"When should mirrors be checked?",o:["Only before moving","Regularly","Never"],a:1},
+{c:"Rules",q:"What is defensive driving?",o:["Aggressive driving","Anticipating danger","Speeding"],a:1},
+
+/* -------- SIGNS (26) -------- */
+{c:"Signs",q:"What does a STOP sign mean?",o:["Slow down","Stop completely","Yield"],a:1},
+{c:"Signs",q:"What does a YIELD sign mean?",o:["Stop","Give way","Speed up"],a:1},
+{c:"Signs",q:"Red circle signs indicate:",o:["Warning","Prohibition","Information"],a:1},
+{c:"Signs",q:"Blue circle signs indicate:",o:["Mandatory","Danger","Prohibition"],a:0},
+{c:"Signs",q:"Triangle with red border means:",o:["Mandatory","Warning","Information"],a:1},
+{c:"Signs",q:"No U-turn sign means:",o:["Turn allowed","No turning","U-turn prohibited"],a:2},
+{c:"Signs",q:"Speed limit sign indicates:",o:["Recommended speed","Maximum speed","Minimum speed"],a:1},
+{c:"Signs",q:"Pedestrian sign warns of:",o:["Animals","People crossing","Schools"],a:1},
+{c:"Signs",q:"Railway crossing sign means:",o:["Stop","Rail ahead","Speed up"],a:1},
+{c:"Signs",q:"Hospital sign indicates:",o:["Quiet zone","Parking","Fuel"],a:0},
+{c:"Signs",q:"One-way sign means:",o:["Two directions","One direction only","Stop"],a:1},
+{c:"Signs",q:"No entry sign means:",o:["Proceed","Do not enter","Yield"],a:1},
+{c:"Signs",q:"Sharp bend sign warns of:",o:["Straight road","Curve ahead","Intersection"],a:1},
+{c:"Signs",q:"Roadworks sign means:",o:["Detour","Men at work","Speed up"],a:1},
+{c:"Signs",q:"Animal crossing sign warns of:",o:["Cows","Wild animals","Zoo"],a:1},
+{c:"Signs",q:"End of speed limit sign means:",o:["Speed increases","Restriction ends","Stop"],a:1},
+{c:"Signs",q:"Parking sign means:",o:["No parking","Parking allowed","Bus stop"],a:1},
+{c:"Signs",q:"Dead end sign means:",o:["No exit","Tunnel","Bridge"],a:0},
+{c:"Signs",q:"Traffic signal ahead sign means:",o:["Stop","Lights ahead","Pedestrian"],a:1},
+{c:"Signs",q:"Children sign warns of:",o:["Playground","School zone","Hospital"],a:1},
+{c:"Signs",q:"Slippery road sign warns of:",o:["Ice","Reduced traction","Flood"],a:1},
+{c:"Signs",q:"Minimum speed sign means:",o:["Slow","Do not go slower","Stop"],a:1},
+{c:"Signs",q:"Height restriction sign applies to:",o:["Width","Height","Weight"],a:1},
+{c:"Signs",q:"Weight limit sign applies to:",o:["Axle load","Vehicle mass","Passengers"],a:1},
+{c:"Signs",q:"Roundabout sign means:",o:["Stop","Circle junction","Traffic lights"],a:1},
+{c:"Signs",q:"Information signs are usually:",o:["Blue","Red","Yellow"],a:0},
+
+/* -------- CONTROLS (8) -------- */
+{c:"Controls",q:"What does the clutch pedal do?",o:["Stop engine","Change gears","Brake vehicle"],a:1},
+{c:"Controls",q:"What does ABS help prevent?",o:["Skidding","Speeding","Overheating"],a:0},
+{c:"Controls",q:"What is the handbrake used for?",o:["Stopping","Parking","Acceleration"],a:1},
+{c:"Controls",q:"What does the accelerator do?",o:["Brake","Increase speed","Change gears"],a:1},
+{c:"Controls",q:"What does the speedometer show?",o:["RPM","Speed","Fuel"],a:1},
+{c:"Controls",q:"What does the fuel gauge indicate?",o:["Oil","Fuel level","Temperature"],a:1},
+{c:"Controls",q:"What does the indicator stalk do?",o:["Lights","Signals turns","Wipers"],a:1},
+{c:"Controls",q:"What does the brake pedal do?",o:["Slow or stop","Change gear","Steer"],a:0},
 ];
 
 let index = 0;
 let score = 0;
-let timeLeft = 60;
-let timer;
 
-function startTimer() {
-  timer = setInterval(() => {
-    timeLeft--;
-    document.getElementById("timer").textContent = "Time: " + timeLeft + "s";
-    if (timeLeft <= 0) endExam();
-  }, 1000);
-}
-
+/* ================= FUNCTIONS ================= */
 function loadQuestion() {
-  document.getElementById("feedback").textContent = "";
   document.getElementById("counter").textContent =
     `Question ${index + 1} of ${questions.length}`;
+  document.getElementById("category").textContent =
+    "Category: " + questions[index].c;
+  document.getElementById("question").textContent =
+    questions[index].q;
 
-  const q = questions[index];
-  document.getElementById("question").textContent = q.q;
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
+  document.getElementById("feedback").textContent = "";
 
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = "";
-
-  q.options.forEach((opt, i) => {
+  questions[index].o.forEach((opt, i) => {
     const btn = document.createElement("button");
     btn.textContent = opt;
     btn.onclick = () => checkAnswer(i);
-    answersDiv.appendChild(btn);
+    answers.appendChild(btn);
   });
 }
 
 function checkAnswer(choice) {
-  if (choice === questions[index].correct) {
+  if (choice === questions[index].a) {
     score++;
     document.getElementById("feedback").textContent = "Correct ✅";
   } else {
     document.getElementById("feedback").textContent = "Wrong ❌";
   }
-
   setTimeout(() => {
     index++;
-    if (index < questions.length) {
-      loadQuestion();
-    } else {
-      endExam();
-    }
-  }, 800);
+    index < questions.length ? loadQuestion() : endExam();
+  }, 600);
 }
 
 function endExam() {
   clearInterval(timer);
   document.querySelector(".card").innerHTML = `
-    <h1>Exam Finished</h1>
-    <p>Your score: ${score} / ${questions.length}</p>
-    <p>${score >= 2 ? "PASS ✅" : "FAIL ❌"}</p>
+    <h1>Exam Completed</h1>
+    <p>Score: ${score} / ${questions.length}</p>
+    <h2>${score >= 44 ? "PASS ✅" : "FAIL ❌"}</h2>
   `;
 }
 
-startTimer();
 loadQuestion();
 </script>
 
