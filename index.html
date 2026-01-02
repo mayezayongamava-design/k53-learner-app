@@ -1,53 +1,113 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-
+  <meta charset="UTF-8" />
   <title>K53 Learner Exam Simulator</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-
-    body { font-family: Arial; background:#f4f4f4; padding:20px }
-
-    .card { background:#fff; padding:20px; border-radius:10px }
-
-    button { padding:10px 15px; margin-top:10px }
-
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px;
+      margin: 8px 0;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .correct {
+      background: #4CAF50;
+      color: white;
+    }
+    .wrong {
+      background: #f44336;
+      color: white;
+    }
   </style>
-
 </head>
-
 <body>
 
-  <div class="card">
-
-    <h2>K53 Learner Exam Simulator</h2>
-
-    <p>Question 1: What does a red traffic light mean?</p>
-
-    <button onclick="check(true)">Stop</button>
-
-    <button onclick="check(false)">Go</button>
-
-    <p id="result"></p>
-
-  </div>
+<div class="card" id="app">
+  <h2>K53 Learner Exam Simulator</h2>
+  <p id="question"></p>
+  <div id="answers"></div>
+  <p id="progress"></p>
+</div>
 
 <script>
+  const questions = [
+    {
+      q: "What does a red traffic light mean?",
+      answers: ["Stop", "Go", "Slow down"],
+      correct: 0
+    },
+    {
+      q: "Who has the right of way at a four-way stop?",
+      answers: ["First vehicle to stop", "Fastest vehicle", "Biggest vehicle"],
+      correct: 0
+    },
+    {
+      q: "What is the legal blood alcohol limit?",
+      answers: ["0.05%", "0.10%", "0.00%"],
+      correct: 0
+    }
+  ];
 
-function check(correct){
+  let current = 0;
+  let score = 0;
 
-  document.getElementById("result").innerText =
+  const questionEl = document.getElementById("question");
+  const answersEl = document.getElementById("answers");
+  const progressEl = document.getElementById("progress");
 
-    correct ? "Correct ✅" : "Wrong ❌";
+  function loadQuestion() {
+    answersEl.innerHTML = "";
+    const q = questions[current];
+    questionEl.textContent = q.q;
+    progressEl.textContent = `Question ${current + 1} of ${questions.length}`;
 
-}
+    q.answers.forEach((answer, index) => {
+      const btn = document.createElement("button");
+      btn.textContent = answer;
+      btn.onclick = () => checkAnswer(index);
+      answersEl.appendChild(btn);
+    });
+  }
 
+  function checkAnswer(selected) {
+    const q = questions[current];
+    if (selected === q.correct) {
+      score++;
+    }
+    current++;
+    if (current < questions.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById("app").innerHTML = `
+      <h2>Exam Finished</h2>
+      <p>Your Score: ${score} / ${questions.length}</p>
+      <p>${score >= 2 ? "✅ PASS" : "❌ FAIL"}</p>
+      <button onclick="location.reload()">Restart Exam</button>
+    `;
+  }
+
+  loadQuestion();
 </script>
 
 </body>
-
 </html>
