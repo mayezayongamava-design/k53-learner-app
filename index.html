@@ -1,112 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>K53 Learner Exam Simulator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    button {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .correct {
-      background: #4CAF50;
-      color: white;
-    }
-    .wrong {
-      background: #f44336;
-      color: white;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>K53 Learner Exam Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button:hover {
+  background: #eaeaea;
+}
+</style>
 </head>
+
 <body>
 
-<div class="card" id="app">
-  <h2>K53 Learner Exam Simulator</h2>
+<div class="card">
+  <h1>K53 Learner Exam</h1>
+
+  <div class="info">
+    <span id="counter">Question 1</span>
+    <span id="timer">Time: 60s</span>
+  </div>
+
   <p id="question"></p>
+
   <div id="answers"></div>
-  <p id="progress"></p>
+
+  <p id="feedback"></p>
 </div>
 
 <script>
-  const questions = [
-    {
-      q: "What does a red traffic light mean?",
-      answers: ["Stop", "Go", "Slow down"],
-      correct: 0
-    },
-    {
-      q: "Who has the right of way at a four-way stop?",
-      answers: ["First vehicle to stop", "Fastest vehicle", "Biggest vehicle"],
-      correct: 0
-    },
-    {
-      q: "What is the legal blood alcohol limit?",
-      answers: ["0.05%", "0.10%", "0.00%"],
-      correct: 0
-    }
-  ];
+const questions = [
+  {
+    q: "What does a red traffic light mean?",
+    options: ["Stop", "Go", "Slow down"],
+    correct: 0
+  },
+  {
+    q: "What does a stop sign mean?",
+    options: ["Slow down", "Stop completely", "Yield"],
+    correct: 1
+  },
+  {
+    q: "What should you do at a pedestrian crossing?",
+    options: ["Hoot", "Stop for pedestrians", "Speed up"],
+    correct: 1
+  }
+];
 
-  let current = 0;
-  let score = 0;
+let index = 0;
+let score = 0;
+let timeLeft = 60;
+let timer;
 
-  const questionEl = document.getElementById("question");
-  const answersEl = document.getElementById("answers");
-  const progressEl = document.getElementById("progress");
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").textContent = "Time: " + timeLeft + "s";
+    if (timeLeft <= 0) endExam();
+  }, 1000);
+}
 
-  function loadQuestion() {
-    answersEl.innerHTML = "";
-    const q = questions[current];
-    questionEl.textContent = q.q;
-    progressEl.textContent = `Question ${current + 1} of ${questions.length}`;
+function loadQuestion() {
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("counter").textContent =
+    `Question ${index + 1} of ${questions.length}`;
 
-    q.answers.forEach((answer, index) => {
-      const btn = document.createElement("button");
-      btn.textContent = answer;
-      btn.onclick = () => checkAnswer(index);
-      answersEl.appendChild(btn);
-    });
+  const q = questions[index];
+  document.getElementById("question").textContent = q.q;
+
+  const answersDiv = document.getElementById("answers");
+  answersDiv.innerHTML = "";
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(i);
+    answersDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(choice) {
+  if (choice === questions[index].correct) {
+    score++;
+    document.getElementById("feedback").textContent = "Correct ✅";
+  } else {
+    document.getElementById("feedback").textContent = "Wrong ❌";
   }
 
-  function checkAnswer(selected) {
-    const q = questions[current];
-    if (selected === q.correct) {
-      score++;
-    }
-    current++;
-    if (current < questions.length) {
+  setTimeout(() => {
+    index++;
+    if (index < questions.length) {
       loadQuestion();
     } else {
-      showResult();
+      endExam();
     }
-  }
+  }, 800);
+}
 
-  function showResult() {
-    document.getElementById("app").innerHTML = `
-      <h2>Exam Finished</h2>
-      <p>Your Score: ${score} / ${questions.length}</p>
-      <p>${score >= 2 ? "✅ PASS" : "❌ FAIL"}</p>
-      <button onclick="location.reload()">Restart Exam</button>
-    `;
-  }
+function endExam() {
+  clearInterval(timer);
+  document.querySelector(".card").innerHTML = `
+    <h1>Exam Finished</h1>
+    <p>Your score: ${score} / ${questions.length}</p>
+    <p>${score >= 2 ? "PASS ✅" : "FAIL ❌"}</p>
+  `;
+}
 
-  loadQuestion();
+startTimer();
+loadQuestion();
 </script>
 
 </body>
